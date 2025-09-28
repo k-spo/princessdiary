@@ -1,0 +1,2262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🩷 Pastel Pink Virtual Diary</title>
+<style>
+  :root{
+    --bg: #fff7fb;
+    --card: #ffeaf4;
+    --accent: #ffb6d1;
+    --muted: #9b6b8c;
+    --ink: #4a3748;
+    --soft: #ffd7e6;
+  }
+  *{box-sizing: border-box; font-family: Inter, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial;}
+  body{
+    margin:0;
+    background: linear-gradient(180deg,#fff7fb 0%, #fff0f6 100%);
+    color:var(--ink);
+    padding: 1.2rem;
+  }
+
+  header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    justify-content:space-between;
+    margin-bottom:1rem;
+  }
+  .brand {
+    display:flex; align-items:center; gap:12px;
+  }
+  .logo {
+    width:52px; height:52px; border-radius:12px; background:linear-gradient(135deg,#ffdaf0,#ffd1e8); display:flex;align-items:center;justify-content:center;font-size:1.5rem;
+    box-shadow: 0 6px 18px rgba(255,182,193,0.25);
+  }
+  h1{margin:0;font-size:1.25rem}
+  header .controls {display:flex; gap:.6rem; align-items:center;}
+
+  .app {
+    display:grid;
+    grid-template-columns: 300px 1fr;
+    gap:1rem;
+  }
+
+  /* Left column */
+  .sidebar {
+    background:var(--card);
+    border-radius:12px;
+    padding:1rem;
+    box-shadow: 0 6px 18px rgba(74,55,72,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+  .profile {
+    display:flex;
+    gap:0.75rem;
+    align-items:center;
+    margin-bottom: 0.8rem;
+  }
+  .pfp {
+    width:64px; height:64px; border-radius:12px; background:linear-gradient(135deg,#ffdff1,#ffd1e8); display:flex;align-items:center;justify-content:center; font-size:1.25rem;
+    overflow:hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  .pfp:hover {
+    transform: scale(1.05);
+  }
+  .pfp img {width:100%; height:100%; object-fit:cover;}
+  .profile .meta {flex:1}
+  .profile .meta h3{margin:0; font-size:1rem}
+  .profile .meta p{margin:0; color:var(--muted); font-size:.85rem}
+
+  .section-title {font-weight:600; margin: .6rem 0 .4rem 0; color:#6b425f; display:flex; justify-content:space-between; align-items:center;}
+  .list {display:flex; flex-direction:column; gap:.45rem}
+  .list button.small {padding:.35rem .5rem; border-radius:8px; font-size:.9rem; background:transparent; border:1px dashed rgba(255,182,193,0.5); color:var(--muted); cursor:pointer}
+
+  .folder-item, .tag-item{
+    display:flex; justify-content:space-between; align-items:center;
+    background:#fff; padding:.45rem .6rem; border-radius:8px; border:1px solid rgba(255,182,193,0.25);
+    transition: all 0.2s ease;
+  }
+  .folder-item:hover, .tag-item:hover {
+    box-shadow: 0 4px 8px rgba(255,182,193,0.2);
+    transform: translateY(-2px);
+  }
+  .folder-item .name, .tag-item .name {font-size:.95rem}
+  .tiny-btn {background:transparent;border:none;color:var(--muted);cursor:pointer;padding:.25rem .4rem;border-radius:8px;font-size:.9rem}
+  .tiny-btn:hover{background:rgba(255,182,193,0.08)}
+  .add-btn {display:block;width:100%; padding:.6rem; border-radius:10px; border:none; background:linear-gradient(90deg,var(--accent),#ffc0d6); color:white; cursor:pointer; font-weight:600; transition: all 0.2s ease;}
+  .add-btn:hover {
+    box-shadow: 0 4px 12px rgba(255,182,193,0.4);
+    transform: translateY(-2px);
+  }
+
+  /* main column */
+  .main {
+    background:var(--card);
+    border-radius:12px;
+    padding:1rem;
+    min-height:520px;
+    box-shadow: 0 8px 24px rgba(74,55,72,0.06);
+    display:flex;
+    flex-direction:column;
+    gap:0.8rem;
+  }
+
+  .top-row {display:flex; gap:.6rem; align-items:center;}
+  .search {flex:1; display:flex; gap:.6rem; align-items:center; position: relative;}
+  input.text, textarea {width:100%; padding:.6rem; border-radius:10px; border:1px solid rgba(255,182,193,0.35); background:transparent; font-size:.95rem}
+  select {padding:.5rem; border-radius:8px; border:1px solid rgba(255,182,193,0.35)}
+
+  .entries {display:grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap:.8rem; margin-top:.4rem; align-items:start}
+  .entry-card {
+    background: linear-gradient(180deg,#fff 0%, #fff2f8 100%);
+    padding:.8rem; border-radius:12px; box-shadow: 0 10px 20px rgba(74,55,72,0.04); position:relative;
+    min-height:120px; display:flex; flex-direction:column; gap:.45rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .entry-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(74,55,72,0.08);
+  }
+  .entry-title {font-weight:700; font-size:1rem; color:#5a2e47}
+  .entry-meta {font-size:.8rem; color:var(--muted); display:flex; gap:.4rem; flex-wrap:wrap}
+  .entry-body {flex:1; color:#5a2e47; opacity:0.95; font-size:.95rem; overflow:hidden; max-height:5.4rem}
+  .entry-actions {display:flex; gap:.4rem; justify-content:flex-end}
+
+  .pill {background:var(--soft); padding:.22rem .4rem; border-radius:6px; font-size:.8rem; color:#7a3e5a}
+
+  /* modal */
+  .modal {display:none; position:fixed; inset:0; z-index:50; align-items:center; justify-content:center; background: rgba(10,6,8,0.35);}
+  .modal.open {display:flex}
+  .modal-card {width:90%; max-width:520px; background:var(--card); padding:1rem 1.1rem; border-radius:12px; box-shadow: 0 10px 30px rgba(74,55,72,0.12); position:relative}
+  .modal-close {position:absolute; right:.6rem; top:.6rem; background:transparent;border:none; font-size:1.1rem; cursor:pointer; color:var(--muted)}
+  .form-row {display:flex; gap:.6rem}
+  .form-row .col {flex:1}
+  label {font-size:.85rem; color:#6b425f; display:block; margin-bottom:.3rem}
+  .actions {display:flex; gap:.6rem; justify-content:flex-end; margin-top:.6rem}
+  .btn {padding:.6rem 0.9rem; border-radius:9px; border:none; cursor:pointer; transition: all 0.2s ease;}
+  .btn.primary {background:linear-gradient(90deg,var(--accent),#ff9fc2); color:white; font-weight:700}
+  .btn.primary:hover {
+    box-shadow: 0 4px 12px rgba(255,182,193,0.4);
+  }
+  .btn.ghost {background:transparent; border:1px solid rgba(255,182,193,0.35); color:var(--muted)}
+  .btn.ghost:hover {
+    background: rgba(255,182,193,0.1);
+  }
+
+  /* Mood selector */
+  .mood-selector {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .mood-option {
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+  }
+  .mood-option:hover {
+    transform: scale(1.2);
+    background: rgba(255,182,193,0.2);
+  }
+  .mood-option.selected {
+    background: rgba(255,182,193,0.3);
+    transform: scale(1.2);
+  }
+
+  /* Weather selector */
+  .weather-selector {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .weather-option {
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+  }
+  .weather-option:hover {
+    transform: scale(1.1);
+    background: rgba(255,182,193,0.2);
+  }
+  .weather-option.selected {
+    background: rgba(255,182,193,0.3);
+    transform: scale(1.1);
+  }
+
+  /* Password protection */
+  .password-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #ffd1e8, #ffdaf0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .password-box {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(74,55,72,0.15);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+  }
+  .password-box h2 {
+    margin-top: 0;
+    color: #5a2e47;
+  }
+
+  /* Theme selector */
+  .theme-selector {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .theme-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+  }
+  .theme-option:hover {
+    transform: scale(1.1);
+  }
+  .theme-option.selected {
+    border-color: var(--muted);
+    transform: scale(1.1);
+  }
+
+  /* Drawing canvas */
+  .drawing-container {
+    margin-top: 10px;
+    border: 1px dashed rgba(255,182,193,0.5);
+    border-radius: 8px;
+    padding: 8px;
+  }
+  #drawingCanvas {
+    background: white;
+    border-radius: 6px;
+    cursor: crosshair;
+    display: block;
+    margin: 0 auto;
+  }
+  .drawing-tools {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  /* Audio recording */
+  .audio-recorder {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .audio-controls {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgba(255,182,193,0.1);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #ff9fc2;
+  }
+
+  /* Animation for new entries */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .entry-card {
+    animation: fadeIn 0.3s ease;
+  }
+
+  /* Confetti effect */
+  .confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background-color: #ffb6d1;
+    opacity: 0.7;
+    border-radius: 0;
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  /* Streak counter */
+  .streak-container {
+    margin-top: 1rem;
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid rgba(255,182,193,0.3);
+  }
+  .streak-title {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+  .streak-count {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ff6b93;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .streak-subtitle {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 0.4rem;
+  }
+
+  /* Reminder notification */
+  .reminder-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 320px;
+    transform: translateY(150%);
+    transition: transform 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    border-left: 4px solid #ffb6d1;
+  }
+  .reminder-notification.show {
+    transform: translateY(0);
+  }
+  .reminder-close {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--muted);
+  }
+
+  /* New styles for enhanced editor */
+  .editor-toolbar {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 6px;
+    background: rgba(255, 182, 209, 0.1);
+    border-radius: 8px;
+  }
+  
+  .font-selector {
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 182, 193, 0.35);
+    background: white;
+    font-size: 0.85rem;
+  }
+  
+  .color-picker {
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgba(255, 182, 193, 0.35);
+    border-radius: 6px;
+    cursor: pointer;
+    background: white;
+  }
+  
+  .image-container {
+    position: relative;
+    display: inline-block;
+    margin: 8px;
+    max-width: 100%;
+  }
+  
+  .image-container img {
+    max-width: 100%;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 182, 193, 0.3);
+  }
+  
+  .image-controls {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .image-container:hover .image-controls {
+    opacity: 1;
+  }
+  
+  .image-resize-handle {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 182, 209, 0.8);
+    border-radius: 50%;
+    cursor: nw-resize;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .image-container:hover .image-resize-handle {
+    opacity: 1;
+  }
+  
+  .font-cute {
+    font-family: "Comic Sans MS", cursive, sans-serif;
+  }
+  
+  .font-cursive {
+    font-family: "Brush Script MT", cursive, sans-serif;
+  }
+  
+  .font-elegant {
+    font-family: "Georgia", serif;
+  }
+  
+  .font-modern {
+    font-family: "Arial", sans-serif;
+  }
+
+  footer {margin-top:.6rem; color:var(--muted); font-size:.85rem; text-align:center}
+  @media (max-width:900px){ 
+    .app{grid-template-columns:1fr; } 
+    .sidebar{order:2}
+    .reminder-notification {
+      left: 20px;
+      right: 20px;
+      max-width: none;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">💌</div>
+    <div>
+      <h1>𝓉𝒽𝑒 𝓅𝓇𝒾𝓃𝒸𝑒𝓈𝓈 𝒹𝒾𝒶𝓇𝓎</h1>
+      <div style="font-size:.85rem;color:var(--muted)">𝘴𝘰𝘧𝘵, 𝘱𝘳𝘪𝘷𝘢𝘵𝘦, 𝘢𝘯𝘥 𝘱𝘢𝘴𝘵𝘦𝘭</div>
+    </div>
+  </div>
+  <div class="controls">
+    <button class="add-btn" id="openAddEntry">+ New Entry</button>
+    <button class="add-btn" id="openProfile" style="width:120px;background:transparent;border:1px solid rgba(255,182,193,0.35);color:var(--muted);">Profile</button>
+    <button class="add-btn" id="toggleLock" style="width:60px;background:transparent;border:1px solid rgba(255,182,193,0.35);color:var(--muted);">🔒</button>
+  </div>
+</header>
+
+<div class="app">
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+    <div class="profile">
+      <div class="pfp" id="pfpPreview">🌸</div>
+      <div class="meta">
+        <h3 id="profileName">Dear Diary</h3>
+        <p id="profileBio">A tiny space for little thoughts.</p>
+        <div style="margin-top:.4rem"><small id="profileColor">𝘍𝘢𝘷𝘰𝘳𝘪𝘵𝘦 𝘤𝘰𝘭𝘰𝘳: pastel pink</small></div>
+      </div>
+    </div>
+
+    <!-- Streak Counter -->
+    <div class="streak-container">
+      <div class="streak-title">Current Streak</div>
+      <div class="streak-count" id="streakCount">0 <span style="color:#ff6b93;">🩷</span></div>
+      <div class="streak-subtitle" id="streakMessage">Start your journaling journey!</div>
+    </div>
+
+    <div style="margin-top:.8rem">
+      <div class="section-title">
+        <span>Folders</span>
+        <div>
+          <button class="tiny-btn" id="openFolderManager">manage</button>
+        </div>
+      </div>
+      <div class="list" id="folderList"></div>
+      <button class="small add-btn" id="addFolderBtn" style="margin-top:.5rem">+ Add Folder</button>
+    </div>
+
+    <div style="margin-top:.8rem">
+      <div class="section-title">
+        <span>Tags</span>
+        <div>
+          <button class="tiny-btn" id="openTagManager">manage</button>
+        </div>
+      </div>
+      <div class="list" id="tagList"></div>
+      <button class="small add-btn" id="addTagBtn" style="margin-top:.5rem">+ Add Tag</button>
+    </div>
+
+    <div style="margin-top:.8rem">
+      <div class="section-title">
+        <span>Stats</span>
+        <span style="font-size:.88rem;color:var(--muted)"><span id="statEntries">0</span> entries</span>
+      </div>
+      <div style="font-size:.88rem;color:var(--muted)">Folders: <strong id="statFolders">0</strong></div>
+      <div style="font-size:.88rem;color:var(--muted)">Tags: <strong id="statTags">0</strong></div>
+      <div style="font-size:.88rem;color:var(--muted)">Word count: <strong id="statWords">0</strong></div>
+    </div>
+
+    <div style="margin-top:.8rem">
+      <div class="section-title">
+        <span>Themes</span>
+      </div>
+      <div class="theme-selector">
+        <div class="theme-option selected" style="background:#ffeaf4;" data-theme="pink"></div>
+        <div class="theme-option" style="background:#e6f5ff;" data-theme="blue"></div>
+        <div class="theme-option" style="background:#f0e6ff;" data-theme="purple"></div>
+        <div class="theme-option" style="background:#e6ffe6;" data-theme="green"></div>
+      </div>
+    </div>
+
+    <!-- Reminder Settings -->
+    <div style="margin-top:.8rem">
+      <div class="section-title">
+        <span>Daily Reminder</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        <label for="reminderTime" style="font-size:0.85rem;color:var(--muted);">Set reminder time:</label>
+        <input type="time" id="reminderTime" class="text" style="font-size:0.9rem;">
+        <button class="small add-btn" id="saveReminderBtn" style="margin-top:0.5rem;">Save Reminder</button>
+        <button class="small add-btn" id="disableReminderBtn" style="background:transparent;border:1px solid rgba(255,182,193,0.5);color:var(--muted);">Disable Reminder</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <section class="main">
+    <div class="top-row">
+      <div class="search">
+        <input class="text" id="searchInput" placeholder="Search entries by title or content..." />
+        <button class="tiny-btn" id="clearSearch" style="position:absolute;right:8px;top:8px;">✕</button>
+      </div>
+      <div style="display:flex;gap:.6rem;align-items:center;">
+        <select id="sortSelect" title="Sort entries">
+          <option value="date-desc">Date: Newest</option>
+          <option value="date-asc">Date: Oldest</option>
+          <option value="title">Title (A → Z)</option>
+          <option value="tag">First Tag (A → Z)</option>
+          <option value="mood">Mood</option>
+        </select>
+        <button class="btn ghost" id="exportBtn">Export</button>
+        <button class="btn ghost" id="clearAll">Clear All</button>
+      </div>
+    </div>
+
+    <div class="entries" id="entriesGrid">
+      <!-- entry cards injected here -->
+    </div>
+
+    <footer>Private & local — stored in your browser 🌷</footer>
+  </section>
+</div>
+
+<!-- Reminder Notification -->
+<div class="reminder-notification" id="reminderNotification">
+  <div style="font-size:1.8rem;">🩷</div>
+  <div>
+    <div style="font-weight:600;margin-bottom:0.3rem;">Time for your daily entry!</div>
+    <div style="font-size:0.9rem;color:var(--muted);">Keep your streak going by writing today's thoughts.</div>
+  </div>
+  <button class="reminder-close" id="closeReminder">✕</button>
+</div>
+
+<!-- MODALS -->
+
+<!-- PROFILE MODAL -->
+<div class="modal" id="profileModal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>Edit Profile</h3>
+    <div style="margin-top:.6rem">
+      <label for="profileNameInput">Name</label>
+      <input id="profileNameInput" class="text" placeholder="What should I call you?" />
+    </div>
+    <div style="margin-top:.4rem">
+      <label for="profilePicInput">Profile picture</label>
+      <input id="profilePicInput" type="file" accept="image/*" />
+    </div>
+    <div style="margin-top:.4rem">
+      <label for="profileBioInput">Small bio</label>
+      <textarea id="profileBioInput" rows="3" placeholder="A few sweet words..."></textarea>
+    </div>
+    <div style="margin-top:.4rem">
+      <label for="profileColorInput">𝐹𝒶𝓋𝑜𝓇𝒾𝓉𝑒 𝒸𝑜𝓁𝑜𝓇</label>
+      <input id="profileColorInput" class="text" placeholder="e.g. pastel pink" />
+    </div>
+    <div style="margin-top:.4rem">
+      <label>Set a password to protect your diary</label>
+      <input type="password" id="diaryPassword" class="text" placeholder="Leave empty to remove password" />
+    </div>
+
+    <div class="actions">
+      <button class="btn ghost" data-close>Cancel</button>
+      <button class="btn primary" id="saveProfileBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOLDER MODAL -->
+<div class="modal" id="folderModal" aria-hidden="true">
+  <div class="modal-card">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>Manage Folders</h3>
+    <div style="margin-top:.6rem">
+      <label for="newFolderName">New folder name</label>
+      <input id="newFolderName" class="text" placeholder="e.g. Personal, Study" />
+      <div style="margin-top:.45rem; display:flex; gap:.5rem; justify-content:flex-end;">
+        <button class="btn ghost" data-close>Close</button>
+        <button class="btn primary" id="createFolderBtn">Add Folder</button>
+      </div>
+    </div>
+
+    <div style="margin-top:1rem">
+      <div id="manageFolderList" style="display:flex;flex-direction:column;gap:.45rem"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TAG MODAL -->
+<div class="modal" id="tagModal" aria-hidden="true">
+  <div class="modal-card">
+    <button class="modal-close" data-close>&times;</button>
+    <h3>Manage Tags</h3>
+    <div style="margin-top:.6rem">
+      <label for="newTagName">New tag</label>
+      <input id="newTagName" class="text" placeholder="e.g. mood, dream" />
+      <div style="margin-top:.45rem; display:flex; gap:.5rem; justify-content:flex-end;">
+        <button class="btn ghost" data-close>Close</button>
+        <button class="btn primary" id="createTagBtn">Add Tag</button>
+      </div>
+    </div>
+
+    <div style="margin-top:1rem">
+      <div id="manageTagList" style="display:flex;flex-direction:column;gap:.45rem"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ENTRY MODAL -->
+<div class="modal" id="entryModal" aria-hidden="true">
+  <div class="modal-card" style="max-width: 800px;">
+    <button class="modal-close" data-close>&times;</button>
+    <h3 id="entryModalTitle">New Entry</h3>
+
+    <div style="margin-top:.6rem">
+      <label for="entryTitle">Title</label>
+      <input id="entryTitle" class="text" placeholder="Title here.." />
+    </div>
+
+    <div style="margin-top:.4rem">
+      <label for="entryFolder">Folder</label>
+      <select id="entryFolder"></select>
+    </div>
+
+    <div style="margin-top:.4rem">
+      <label>Tags</label>
+      <div id="entryTagCheckboxes" style="display:flex; gap:.4rem; flex-wrap:wrap;"></div>
+    </div>
+
+    <div style="margin-top:.4rem">
+      <label>How are you feeling today?</label>
+      <div class="mood-selector" id="moodSelector">
+        <div class="mood-option" data-mood="happy">😊</div>
+        <div class="mood-option" data-mood="sad">😢</div>
+        <div class="mood-option" data-mood="excited">🤩</div>
+        <div class="mood-option" data-mood="tired">😴</div>
+        <div class="mood-option" data-mood="love">😍</div>
+        <div class="mood-option" data-mood="angry">😠</div>
+        <div class="mood-option" data-mood="sick">🤒</div>
+        <div class="mood-option" data-mood="neutral">😐</div>
+      </div>
+    </div>
+
+    <div style="margin-top:.4rem">
+      <label>What's the weather like?</label>
+      <div class="weather-selector" id="weatherSelector">
+        <div class="weather-option" data-weather="sunny">☀️</div>
+        <div class="weather-option" data-weather="cloudy">☁️</div>
+        <div class="weather-option" data-weather="rainy">🌧️</div>
+        <div class="weather-option" data-weather="snowy">❄️</div>
+        <div class="weather-option" data-weather="windy">💨</div>
+        <div class="weather-option" data-weather="stormy">⛈️</div>
+      </div>
+    </div>
+
+    <div style="margin-top:.4rem">
+      <label for="entryBody">Entry</label>
+      <div class="editor-toolbar">
+        <button class="tiny-btn" data-format="bold" title="Bold">B</button>
+        <button class="tiny-btn" data-format="italic" title="Italic">I</button>
+        <button class="tiny-btn" data-format="underline" title="Underline">U</button>
+        <select class="font-selector" id="fontSelector">
+          <option value="">Default Font</option>
+          <option value="font-cute">Cute Font</option>
+          <option value="font-cursive">Cursive</option>
+          <option value="font-elegant">Elegant</option>
+          <option value="font-modern">Modern</option>
+        </select>
+        <input type="color" class="color-picker" id="textColorPicker" title="Text Color">
+        <button class="tiny-btn" id="insertImageBtn" title="Insert Image">🖼️</button>
+        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+      </div>
+      <div id="entryBody" contenteditable="true" style="min-height:200px;border:1px solid rgba(255,182,193,0.35);border-radius:10px;padding:.6rem;font-size:.95rem"></div>
+      <div style="text-align:right;font-size:.8rem;color:var(--muted);margin-top:4px;">
+        Word count: <span id="wordCount">0</span>
+      </div>
+    </div>
+
+    <div style="margin-top:.4rem">
+      <label>Add voice note</label>
+      <div class="audio-recorder">
+        <div class="audio-controls">
+          <button class="tiny-btn" id="startRecording">🎤 Start</button>
+          <button class="tiny-btn" id="stopRecording" disabled>⏹️ Stop</button>
+          <button class="tiny-btn" id="playRecording" disabled>▶️ Play</button>
+        </div>
+        <audio id="audioPlayback" controls style="width:100%;margin-top:8px;display:none;"></audio>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn ghost" data-close>Cancel</button>
+      <button class="btn primary" id="saveEntryBtn">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW ENTRY MODAL -->
+<div class="modal" id="viewEntryModal" aria-hidden="true">
+  <div class="modal-card">
+    <button class="modal-close" data-close>&times;</button>
+    <h3 id="viewEntryTitle"></h3>
+    
+    <div style="margin-top:.6rem;display:flex;gap:8px;align-items:center;">
+      <span id="viewEntryMood" style="font-size:1.5rem;"></span>
+      <span id="viewEntryWeather" style="font-size:1.2rem;"></span>
+      <span id="viewEntryDate" style="color:var(--muted);font-size:.9rem;"></span>
+    </div>
+    
+    <div style="margin-top:.6rem;">
+      <span id="viewEntryFolder" class="pill"></span>
+      <span id="viewEntryTags" style="display:inline-flex;gap:4px;flex-wrap:wrap;"></span>
+    </div>
+    
+    <div style="margin-top:1rem;border-top:1px solid rgba(255,182,193,0.3);padding-top:1rem;">
+      <div id="viewEntryBody" style="line-height:1.6;"></div>
+    </div>
+    
+    <div id="viewEntryDrawing" style="margin-top:1rem;text-align:center;display:none;">
+      <img id="viewDrawingImg" style="max-width:100%;border-radius:8px;border:1px solid rgba(255,182,193,0.3);">
+    </div>
+    
+    <div id="viewEntryAudio" style="margin-top:1rem;display:none;">
+      <audio controls style="width:100%"></audio>
+    </div>
+
+    <div class="actions">
+      <button class="btn ghost" data-close>Close</button>
+      <button class="btn primary" id="editEntryBtn">Edit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm delete modal -->
+<div class="modal" id="confirmModal">
+  <div class="modal-card">
+    <button class="modal-close" data-close>&times;</button>
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p id="confirmMsg" style="color:var(--muted)">This action cannot be undone.</p>
+    <div class="actions">
+      <button class="btn ghost" data-close>Cancel</button>
+      <button class="btn primary" id="confirmYesBtn">Yes, delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Password Screen (shown on first load if password is set) -->
+<div class="password-screen" id="passwordScreen" style="display:none;">
+  <div class="password-box">
+    <h2>🔒 𝒟𝒾𝒶𝓇𝓎 𝐿𝑜𝒸𝓀𝑒𝒹</h2>
+    <p>𝐸𝓃𝓉𝑒𝓇 𝓎𝑜𝓊𝓇 𝓅𝒶𝓈𝓈𝓌𝑜𝓇𝒹 𝒷𝑒𝓁𝑜𝓌 𝓉𝑜 𝓊𝓃𝓁𝑜𝒸𝓀 𝓎𝑜𝓊𝓇 𝒹𝒾𝒶𝓇𝓎</p>
+    <input type="password" id="passwordInput" class="text" placeholder="Your diary password" style="margin:1rem 0;" />
+    <button class="btn primary" id="unlockDiary">Unlock</button>
+  </div>
+</div>
+
+<script>
+/* Pastel Diary - Single-file app
+   Data stored in localStorage under key 'pastelDiaryData'
+   Structure:
+   { 
+     profile: {name,bio,color,pfpDataUrl,password}, 
+     folders: [{id,name}], 
+     tags: [{id,name}], 
+     entries: [{id,title,body,folderId,tagIds:[],mood,weather,drawing,audio,created,updated}],
+     streak: {count: number, lastEntryDate: string},
+     reminder: {enabled: boolean, time: string}
+   }
+*/
+const STORAGE_KEY = 'pastelDiaryData_v3';
+
+const qs = s => document.querySelector(s);
+const qsa = s => Array.from(document.querySelectorAll(s));
+const el = (t, opts = {}) => Object.assign(document.createElement(t), opts);
+
+let state = {
+  profile: { name: 'Dear Diary', bio: 'A tiny space for little thoughts.', color: 'pastel pink', pfp: null, password: null },
+  folders: [], 
+  tags: [], 
+  entries: [],
+  streak: { count: 0, lastEntryDate: null },
+  reminder: { enabled: false, time: "20:00" }
+};
+
+// Audio recording variables
+let mediaRecorder;
+let audioChunks = [];
+let currentAudio = null;
+
+// Drawing variables
+let drawingCanvas, drawingCtx;
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+
+// Reminder variables
+let reminderInterval = null;
+
+// Image resizing variables
+let isResizing = false;
+let currentImage = null;
+let startX, startY, startWidth, startHeight;
+
+function loadState(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) state = JSON.parse(raw);
+    // migration safety: ensure all properties exist
+    state.folders = state.folders || [];
+    state.tags = state.tags || [];
+    state.entries = state.entries || [];
+    state.profile.password = state.profile.password || null;
+    state.streak = state.streak || { count: 0, lastEntryDate: null };
+    state.reminder = state.reminder || { enabled: false, time: "20:00" };
+  } catch(e){
+    console.error('failed to load', e);
+  }
+}
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  renderAll();
+  updateWordCount();
+  updateStreakDisplay();
+}
+
+/* UTIL */
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function findFolder(id){ return state.folders.find(f=>f.id===id) || null; }
+function findTag(id){ return state.tags.find(t=>t.id===id) || null; }
+function humanDate(ts){ const d = new Date(ts); return d.toLocaleString(); }
+
+// Get today's date in YYYY-MM-DD format
+function getTodayDate() {
+  const today = new Date();
+  return today.toISOString().split('T')[0];
+}
+
+// Calculate streak
+function updateStreak() {
+  const today = getTodayDate();
+  
+  // If we already have an entry today, don't update
+  if (state.streak.lastEntryDate === today) return;
+  
+  const lastEntry = state.streak.lastEntryDate;
+  
+  if (!lastEntry) {
+    // First entry ever
+    state.streak = { count: 1, lastEntryDate: today };
+    return;
+  }
+  
+  // Calculate days between last entry and today
+  const lastEntryDate = new Date(lastEntry);
+  const todayDate = new Date(today);
+  const diffTime = Math.abs(todayDate - lastEntryDate);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays === 1) {
+    // Consecutive day - increment streak
+    state.streak.count += 1;
+  } else if (diffDays > 1) {
+    // Broken streak - reset to 1
+    state.streak.count = 1;
+  }
+  
+  state.streak.lastEntryDate = today;
+}
+
+// Update streak display
+function updateStreakDisplay() {
+  const streakCount = qs('#streakCount');
+  const streakMessage = qs('#streakMessage');
+  
+  streakCount.innerHTML = `${state.streak.count} <span style="color:#ff6b93;">🩷</span>`;
+  
+  if (state.streak.count === 0) {
+    streakMessage.textContent = "Start your journaling journey!";
+  } else if (state.streak.count === 1) {
+    streakMessage.textContent = "You've started a streak!";
+  } else if (state.streak.count < 7) {
+    streakMessage.textContent = `Keep going! ${7 - state.streak.count} days until your first week!`;
+  } else if (state.streak.count === 7) {
+    streakMessage.textContent = "Amazing! One week streak! 🎉";
+  } else if (state.streak.count < 30) {
+    streakMessage.textContent = `${state.streak.count} days strong!`;
+  } else if (state.streak.count === 30) {
+    streakMessage.textContent = "Incredible! One month streak! 🌟";
+  } else {
+    streakMessage.textContent = `${state.streak.count} days of journaling!`;
+  }
+}
+
+/* Count words in all entries */
+function updateWordCount() {
+  const totalWords = state.entries.reduce((count, entry) => {
+    // Strip HTML tags and count words
+    const text = entry.body.replace(/<[^>]*>/g, ' ');
+    const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+    return count + words.length;
+  }, 0);
+  qs('#statWords').textContent = totalWords;
+}
+
+/* Create confetti effect */
+function createConfetti() {
+  const colors = ['#ffb6d1', '#ffd7e6', '#ff9fc2', '#ffc0d6', '#ffeaf4'];
+  for (let i = 0; i < 30; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.style.left = Math.random() * 100 + 'vw';
+    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.width = (5 + Math.random() * 10) + 'px';
+    confetti.style.height = (5 + Math.random() * 10) + 'px';
+    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+    
+    document.body.appendChild(confetti);
+    
+    const animation = confetti.animate([
+      { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+      { transform: `translateY(100vh) rotate(${360 + Math.random() * 360}deg)`, opacity: 0 }
+    ], {
+      duration: 1000 + Math.random() * 3000,
+      easing: 'cubic-bezier(0.1, 0.8, 0.1, 1)'
+    });
+    
+    animation.onfinish = () => confetti.remove();
+  }
+}
+
+/* Show reminder notification */
+function showReminder() {
+  const notification = qs('#reminderNotification');
+  notification.classList.add('show');
+  
+  // Auto hide after 10 seconds
+  setTimeout(() => {
+    notification.classList.remove('show');
+  }, 10000);
+}
+
+/* Setup reminder system */
+function setupReminder() {
+  // Clear any existing interval
+  if (reminderInterval) {
+    clearInterval(reminderInterval);
+  }
+  
+  // If reminders are disabled, exit
+  if (!state.reminder.enabled) return;
+  
+  // Parse the reminder time
+  const [hours, minutes] = state.reminder.time.split(':').map(Number);
+  
+  // Set up interval to check every minute
+  reminderInterval = setInterval(() => {
+    const now = new Date();
+    if (now.getHours() === hours && now.getMinutes() === minutes) {
+      // Check if user has already written today
+      if (state.streak.lastEntryDate !== getTodayDate()) {
+        showReminder();
+      }
+    }
+  }, 60000); // Check every minute
+}
+
+/* RENDER */
+function renderProfile(){
+  qs('#profileName').textContent = state.profile.name || 'Dear Diary';
+  qs('#profileBio').textContent = state.profile.bio || '';
+  qs('#profileColor').textContent = '𝐹𝒶𝓋𝑜𝓇𝒾𝓉𝑒 𝒸𝑜𝓁𝑜𝓇: ' + (state.profile.color || 'pastel');
+  const pfp = qs('#pfpPreview');
+  pfp.innerHTML = '';
+  if(state.profile.pfp){
+    const img = el('img'); img.src = state.profile.pfp; pfp.appendChild(img);
+  } else {
+    pfp.textContent = '🌸';
+  }
+  
+  // Set reminder time if enabled
+  if (state.reminder.enabled) {
+    qs('#reminderTime').value = state.reminder.time;
+  }
+}
+
+function renderFolders(){
+  const folderList = qs('#folderList'); folderList.innerHTML = '';
+  const manageList = qs('#manageFolderList'); manageList.innerHTML = '';
+
+  // always include "Unsorted" special folder
+  const unsorted = { id: null, name: 'Unsorted' };
+  const full = [unsorted, ...state.folders];
+
+  full.forEach(f => {
+    const item = el('div', { className: 'folder-item' });
+    const name = el('div', { className: 'name' }); name.textContent = f.name;
+    const right = el('div');
+    if(f.id !== null){
+      const edit = el('button', { className: 'tiny-btn', innerText: '✏️' });
+      edit.onclick = () => renameFolder(f.id);
+      const del = el('button', { className: 'tiny-btn', innerText: '🗑️' });
+      del.onclick = () => confirmAction('Delete folder?', `Delete "${f.name}" and move its entries to Unsorted?`, () => {
+        // move entries to unsorted
+        state.entries.forEach(e => { if(e.folderId === f.id) e.folderId = null; });
+        // remove folder
+        state.folders = state.folders.filter(ff => ff.id !== f.id);
+        saveState();
+      });
+      right.appendChild(edit); right.appendChild(del);
+    } else {
+      const placeholder = el('span',{ style:'color:var(--muted);font-size:.86rem', innerText: '🩷' }); right.appendChild(placeholder);
+    }
+    item.appendChild(name); item.appendChild(right);
+    folderList.appendChild(item);
+
+    // manage pane (with drag ordering possible later)
+    if(f.id !== null){
+      const m = el('div', { className: 'folder-item' });
+      m.innerHTML = `<div class="name">${f.name}</div>`;
+      const tools = el('div');
+      const edit = el('button', { className:'tiny-btn', innerText:'Edit' }); edit.onclick = () => renameFolder(f.id);
+      const del = el('button', { className:'tiny-btn', innerText:'Delete' }); del.onclick = () => {
+        confirmAction('Delete folder?', `Delete "${f.name}" and move its entries to Unsorted?`, () => {
+          state.entries.forEach(e => { if(e.folderId === f.id) e.folderId = null; });
+          state.folders = state.folders.filter(ff => ff.id !== f.id);
+          saveState();
+        });
+      };
+      tools.appendChild(edit); tools.appendChild(del);
+      m.appendChild(tools);
+      manageList.appendChild(m);
+    }
+  });
+
+  qs('#statFolders').textContent = state.folders.length;
+}
+
+function renderTags(){
+  const tagList = qs('#tagList'); tagList.innerHTML = '';
+  const manageList = qs('#manageTagList'); manageList.innerHTML = '';
+
+  state.tags.forEach(t => {
+    const item = el('div', { className: 'tag-item' });
+    const name = el('div', { className: 'name' }); name.textContent = t.name;
+    const right = el('div');
+    const edit = el('button', { className:'tiny-btn', innerText:'✏️' }); edit.onclick = () => renameTag(t.id);
+    const del = el('button', { className:'tiny-btn', innerText:'🗑️' }); del.onclick = () => confirmAction('Delete tag?', `Delete tag "${t.name}" from all entries?`, () => {
+      state.entries.forEach(e => { e.tagIds = e.tagIds.filter(id=>id!==t.id); });
+      state.tags = state.tags.filter(tt => tt.id !== t.id);
+      saveState();
+    });
+    right.appendChild(edit); right.appendChild(del);
+    item.appendChild(name); item.appendChild(right);
+    tagList.appendChild(item);
+
+    // manage list
+    const m = el('div', { className: 'tag-item' });
+    m.innerHTML = `<div class="name">${t.name}</div>`;
+    const tools = el('div');
+    const edit2 = el('button', { className:'tiny-btn', innerText:'Edit' }); edit2.onclick = () => renameTag(t.id);
+    const del2 = el('button', { className:'tiny-btn', innerText:'Delete' }); del2.onclick = () => {
+      confirmAction('Delete tag?', `Delete tag "${t.name}" from all entries?`, () => {
+        state.entries.forEach(e => { e.tagIds = e.tagIds.filter(id=>id!==t.id); });
+        state.tags = state.tags.filter(tt => tt.id !== t.id);
+        saveState();
+      });
+    };
+    tools.appendChild(edit2); tools.appendChild(del2);
+    m.appendChild(tools);
+    manageList.appendChild(m);
+  });
+
+  qs('#statTags').textContent = state.tags.length;
+}
+
+function renderEntries(){
+  const grid = qs('#entriesGrid'); grid.innerHTML = '';
+  const search = qs('#searchInput').value.trim().toLowerCase();
+  const sort = qs('#sortSelect').value;
+
+  let entries = state.entries.slice();
+
+  if(search){
+    entries = entries.filter(e => 
+      (e.title||'').toLowerCase().includes(search) || 
+      (e.body||'').toLowerCase().includes(search) ||
+      (e.mood && 'mood:' + e.mood === search) ||
+      (e.weather && 'weather:' + e.weather === search)
+    );
+  }
+
+  // sorting
+  if(sort === 'date-desc') entries.sort((a,b)=>b.created - a.created);
+  else if(sort === 'date-asc') entries.sort((a,b)=>a.created - a.created);
+  else if(sort === 'title') entries.sort((a,b)=> (a.title||'').localeCompare(b.title||'') );
+  else if(sort === 'tag') entries.sort((a,b)=>{
+    const aTag = (state.tags.find(t=>t.id===a.tagIds[0]) || {name:''}).name;
+    const bTag = (state.tags.find(t=>t.id===b.tagIds[0]) || {name:''}).name;
+    return aTag.localeCompare(bTag);
+  });
+  else if(sort === 'mood') entries.sort((a,b)=> (a.mood||'').localeCompare(b.mood||'') );
+
+  entries.forEach(entry => {
+    const card = el('article', { className: 'entry-card' });
+    const title = el('div', { className: 'entry-title' }); title.textContent = entry.title || '(untitled)';
+    const meta = el('div', { className:'entry-meta' });
+    const folderName = entry.folderId ? (findFolder(entry.folderId)?.name || 'Folder') : 'Unsorted';
+    meta.innerHTML = `<div class="pill">${folderName}</div><div>${humanDate(entry.created)}</div>`;
+    
+    // mood and weather
+    if(entry.mood) {
+      const moodEmoji = getMoodEmoji(entry.mood);
+      if (moodEmoji) {
+        const moodSpan = el('div'); 
+        moodSpan.textContent = moodEmoji;
+        moodSpan.style.fontSize = '1.2rem';
+        meta.appendChild(moodSpan);
+      }
+    }
+    
+    if(entry.weather) {
+      const weatherEmoji = getWeatherEmoji(entry.weather);
+      if (weatherEmoji) {
+        const weatherSpan = el('div'); 
+        weatherSpan.textContent = weatherEmoji;
+        weatherSpan.style.fontSize = '1rem';
+        meta.appendChild(weatherSpan);
+      }
+    }
+    
+    // tags
+    if(entry.tagIds && entry.tagIds.length){
+      entry.tagIds.forEach(tid=>{
+        const t = findTag(tid); if(t) {
+          const span = el('div', { className:'pill' }); span.textContent = '#'+t.name;
+          meta.appendChild(span);
+        }
+      });
+    }
+    
+    const body = el('div', { className: 'entry-body' }); 
+    // Strip HTML tags for preview
+    body.textContent = (entry.body || '').replace(/<[^>]*>/g, ' ').substring(0, 100) + '...';
+    
+    const actions = el('div', { className: 'entry-actions' });
+    const viewBtn = el('button', { className:'tiny-btn', innerText:'View' }); viewBtn.onclick = ()=> viewEntry(entry.id);
+    const editBtn = el('button', { className:'tiny-btn', innerText:'Edit' }); editBtn.onclick = ()=> openEntry(entry.id, true);
+    const delBtn = el('button', { className:'tiny-btn', innerText:'Delete' }); delBtn.onclick = ()=> confirmAction('Delete entry?', `Delete "${entry.title || 'untitled'}"?`, ()=>{
+      state.entries = state.entries.filter(e=>e.id!==entry.id);
+      saveState();
+      createConfetti();
+    });
+    actions.appendChild(viewBtn); actions.appendChild(editBtn); actions.appendChild(delBtn);
+
+    card.appendChild(title);
+    card.appendChild(meta);
+    card.appendChild(body);
+    card.appendChild(actions);
+    grid.appendChild(card);
+  });
+
+  qs('#statEntries').textContent = state.entries.length;
+}
+
+/* RENDER helper for entry modal select & tag checkboxes */
+function populateEntryControls(selectedFolder = null, selectedTagIds = []){
+  const folderSelect = qs('#entryFolder'); folderSelect.innerHTML = '';
+  const uns = el('option'); uns.value = ''; uns.textContent = 'Unsorted';
+  folderSelect.appendChild(uns);
+  state.folders.forEach(f=>{
+    const o = el('option'); o.value = f.id; o.textContent = f.name;
+    if(f.id === selectedFolder) o.selected = true;
+    folderSelect.appendChild(o);
+  });
+
+  const checkWrap = qs('#entryTagCheckboxes'); checkWrap.innerHTML = '';
+  state.tags.forEach(t=>{
+    const id = uid();
+    const label = el('label', { style:'display:inline-flex;align-items:center;gap:.35rem;border-radius:8px;padding:.2rem .4rem;border:1px solid rgba(255,182,193,0.18);margin:0 .25rem .25rem 0;' });
+    const input = el('input'); input.type='checkbox'; input.value=t.id; input.checked = selectedTagIds.includes(t.id);
+    label.appendChild(input);
+    const text = el('span'); text.textContent = t.name; text.style.fontSize='.9rem';
+    label.appendChild(text);
+    checkWrap.appendChild(label);
+  });
+}
+
+/* OPEN MODALS */
+function openModal(id){ 
+  qs(id).classList.add('open'); 
+  qs(id).setAttribute('aria-hidden','false'); 
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id){ 
+  qs(id).classList.remove('open'); 
+  qs(id).setAttribute('aria-hidden','true'); 
+  document.body.style.overflow = 'auto';
+}
+
+function openProfileModal(){
+  qs('#profileNameInput').value = state.profile.name || '';
+  qs('#profileBioInput').value = state.profile.bio || '';
+  qs('#profileColorInput').value = state.profile.color || '';
+  qs('#diaryPassword').value = '';
+  openModal('#profileModal');
+}
+
+function openFolderManager(){
+  qs('#newFolderName').value = '';
+  openModal('#folderModal');
+  // populate manage list
+  renderFolders();
+}
+
+function openTagManager(){
+  qs('#newTagName').value = '';
+  openModal('#tagModal');
+  renderTags();
+}
+
+let editingEntryId = null;
+function openEntry(entryId=null, edit=false){
+  editingEntryId = entryId;
+  const modal = qs('#entryModal');
+  qs('#entryModalTitle').textContent = entryId ? (edit ? 'Edit Entry' : 'New Entry') : 'New Entry';
+  
+  // Reset mood and weather selection
+  qsa('.mood-option').forEach(opt => opt.classList.remove('selected'));
+  qsa('.weather-option').forEach(opt => opt.classList.remove('selected'));
+  
+  // Clear drawing canvas
+  if (drawingCtx) {
+    drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+  }
+  
+  // Reset audio
+  currentAudio = null;
+  qs('#audioPlayback').style.display = 'none';
+  qs('#stopRecording').disabled = true;
+  qs('#playRecording').disabled = true;
+  
+  if(!entryId){
+    qs('#entryTitle').value = '';
+    qs('#entryBody').innerHTML = '';
+    populateEntryControls(null, []);
+    qs('#saveEntryBtn').style.display = '';
+    qs('#wordCount').textContent = '0';
+  } else {
+    const e = state.entries.find(x=>x.id===entryId);
+    if(!e) return;
+    qs('#entryTitle').value = e.title || '';
+    qs('#entryBody').innerHTML = e.body || '';
+    populateEntryControls(e.folderId, e.tagIds || []);
+    qs('#saveEntryBtn').style.display = edit ? '' : 'none';
+    
+    // Set mood if exists
+    if (e.mood) {
+      const moodOption = qs(`.mood-option[data-mood="${e.mood}"]`);
+      if (moodOption) moodOption.classList.add('selected');
+    }
+    
+    // Set weather if exists
+    if (e.weather) {
+      const weatherOption = qs(`.weather-option[data-weather="${e.weather}"]`);
+      if (weatherOption) weatherOption.classList.add('selected');
+    }
+    
+    // Load drawing if exists
+    if (e.drawing && drawingCtx) {
+      const img = new Image();
+      img.onload = function() {
+        drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+        drawingCtx.drawImage(img, 0, 0);
+      };
+      img.src = e.drawing;
+    }
+    
+    // Load audio if exists
+    if (e.audio) {
+      currentAudio = e.audio;
+      qs('#audioPlayback').src = e.audio;
+      qs('#audioPlayback').style.display = 'block';
+      qs('#playRecording').disabled = false;
+    }
+    
+    // Update word count
+    updateWordCountForEntry();
+  }
+  openModal('#entryModal');
+}
+
+function viewEntry(entryId) {
+  const e = state.entries.find(x=>x.id===entryId);
+  if(!e) return;
+  
+  qs('#viewEntryTitle').textContent = e.title || '(untitled)';
+  qs('#viewEntryDate').textContent = humanDate(e.created);
+  
+  // Set mood and weather
+  qs('#viewEntryMood').textContent = e.mood ? getMoodEmoji(e.mood) : '';
+  qs('#viewEntryWeather').textContent = e.weather ? getWeatherEmoji(e.weather) : '';
+  
+  // Set folder and tags
+  const folderName = e.folderId ? (findFolder(e.folderId)?.name || 'Folder') : 'Unsorted';
+  qs('#viewEntryFolder').textContent = folderName;
+  
+  const tagsContainer = qs('#viewEntryTags');
+  tagsContainer.innerHTML = '';
+  if(e.tagIds && e.tagIds.length){
+    e.tagIds.forEach(tid=>{
+      const t = findTag(tid); 
+      if(t) {
+        const span = el('span', { className:'pill' }); 
+        span.textContent = '#'+t.name;
+        tagsContainer.appendChild(span);
+      }
+    });
+  }
+  
+  // Set entry body
+  qs('#viewEntryBody').innerHTML = e.body || '';
+  
+  // Show drawing if exists
+  if (e.drawing) {
+    qs('#viewDrawingImg').src = e.drawing;
+    qs('#viewEntryDrawing').style.display = 'block';
+  } else {
+    qs('#viewEntryDrawing').style.display = 'none';
+  }
+  
+  // Show audio if exists
+  if (e.audio) {
+    const audioElement = qs('#viewEntryAudio audio');
+    audioElement.src = e.audio;
+    qs('#viewEntryAudio').style.display = 'block';
+  } else {
+    qs('#viewEntryAudio').style.display = 'none';
+  }
+  
+  // Set up edit button
+  qs('#editEntryBtn').onclick = () => {
+    closeModal('#viewEntryModal');
+    setTimeout(() => openEntry(entryId, true), 300);
+  };
+  
+  openModal('#viewEntryModal');
+}
+
+/* Helper functions for mood and weather */
+function getMoodEmoji(mood) {
+  const moodMap = {
+    'happy': '😊',
+    'sad': '😢',
+    'excited': '🤩',
+    'tired': '😴',
+    'love': '😍',
+    'angry': '😠',
+    'sick': '🤒',
+    'neutral': '😐'
+  };
+  return moodMap[mood] || '';
+}
+
+function getWeatherEmoji(weather) {
+  const weatherMap = {
+    'sunny': '☀️',
+    'cloudy': '☁️',
+    'rainy': '🌧️',
+    'snowy': '❄️',
+    'windy': '💨',
+    'stormy': '⛈️'
+  };
+  return weatherMap[weather] || '';
+}
+
+/* CRUD operations */
+function addFolder(name){
+  if(!name || !name.trim()) return;
+  state.folders.push({ id: uid(), name: name.trim() });
+  saveState();
+}
+function renameFolder(id){
+  const f = findFolder(id); if(!f) return;
+  const newName = prompt('Rename folder', f.name);
+  if(newName && newName.trim()){
+    f.name = newName.trim();
+    saveState();
+  }
+}
+function addTag(name){
+  if(!name || !name.trim()) return;
+  state.tags.push({ id: uid(), name: name.trim() });
+  saveState();
+}
+function renameTag(id){
+  const t = findTag(id); if(!t) return;
+  const newName = prompt('Rename tag', t.name);
+  if(newName && newName.trim()){
+    t.name = newName.trim();
+    saveState();
+  }
+}
+
+function saveEntryFromModal(){
+  const title = qs('#entryTitle').value.trim();
+  const body = qs('#entryBody').innerHTML;
+  const folderVal = qs('#entryFolder').value || null;
+  const checked = Array.from(qs('#entryTagCheckboxes').querySelectorAll('input[type="checkbox"]:checked')).map(i=>i.value);
+  
+  // Get selected mood
+  const selectedMood = qs('.mood-option.selected');
+  const mood = selectedMood ? selectedMood.dataset.mood : null;
+  
+  // Get selected weather
+  const selectedWeather = qs('.weather-option.selected');
+  const weather = selectedWeather ? selectedWeather.dataset.weather : null;
+  
+  if(editingEntryId){
+    // update
+    const e = state.entries.find(x=>x.id===editingEntryId);
+    if(e){
+      e.title = title;
+      e.body = body;
+      e.folderId = folderVal || null;
+      e.tagIds = checked;
+      e.mood = mood;
+      e.weather = weather;
+      e.updated = Date.now();
+      saveState();
+    }
+  } else {
+    const newEntry = {
+      id: uid(), 
+      title, 
+      body, 
+      folderId: folderVal || null, 
+      tagIds: checked, 
+      mood,
+      weather,
+      created: Date.now(), 
+      updated: Date.now()
+    };
+    state.entries.push(newEntry);
+    
+    // Update streak when adding a new entry
+    updateStreak();
+    saveState();
+    createConfetti();
+    
+    // Show heart animation for streak
+    showHeartAnimation();
+  }
+  editingEntryId = null;
+  closeModal('#entryModal');
+}
+
+// Show heart animation for streak encouragement
+function showHeartAnimation() {
+  const heart = document.createElement('div');
+  heart.innerHTML = '🩷';
+  heart.style.position = 'fixed';
+  heart.style.bottom = '20px';
+  heart.style.left = '50%';
+  heart.style.transform = 'translateX(-50%)';
+  heart.style.fontSize = '2rem';
+  heart.style.zIndex = '1000';
+  heart.style.opacity = '0';
+  
+  document.body.appendChild(heart);
+  
+  // Animate the heart
+  const animation = heart.animate([
+    { opacity: 0, transform: 'translateX(-50%) translateY(0)' },
+    { opacity: 1, transform: 'translateX(-50%) translateY(-20px)' },
+    { opacity: 0, transform: 'translateX(-50%) translateY(-40px)' }
+  ], {
+    duration: 2000,
+    easing: 'ease-out'
+  });
+  
+  animation.onfinish = () => heart.remove();
+}
+
+/* confirm helper */
+function confirmAction(title, msg, onYes){
+  qs('#confirmTitle').textContent = title;
+  qs('#confirmMsg').textContent = msg || '';
+  openModal('#confirmModal');
+  const yes = qs('#confirmYesBtn');
+  const handler = () => { onYes(); closeModal('#confirmModal'); yes.removeEventListener('click', handler); };
+  yes.addEventListener('click', handler);
+}
+
+/* Password protection */
+function checkPassword() {
+  if (state.profile.password) {
+    qs('#passwordScreen').style.display = 'flex';
+    return false;
+  }
+  return true;
+}
+
+function unlockDiary() {
+  const password = qs('#passwordInput').value;
+  if (password === state.profile.password) {
+    qs('#passwordScreen').style.display = 'none';
+    return true;
+  } else {
+    alert('Incorrect password. Please try again.');
+    return false;
+  }
+}
+
+/* Export and import data */
+function exportData() {
+  const dataStr = JSON.stringify(state);
+  const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+  
+  const exportFileDefaultName = 'pastel-diary-backup.json';
+  
+  const linkElement = document.createElement('a');
+  linkElement.setAttribute('href', dataUri);
+  linkElement.setAttribute('download', exportFileDefaultName);
+  linkElement.click();
+}
+
+function importData(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const importedState = JSON.parse(e.target.result);
+      if (confirm('This will replace all your current data. Are you sure?')) {
+        state = importedState;
+        saveState();
+        alert('Data imported successfully!');
+      }
+    } catch (err) {
+      alert('Error importing data: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* Word count update */
+function updateWordCountForEntry() {
+  const text = qs('#entryBody').innerText;
+  const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+  qs('#wordCount').textContent = words.length;
+}
+
+/* Setup drawing canvas */
+function setupDrawing() {
+  drawingCanvas = qs('#drawingCanvas');
+  if (!drawingCanvas) return;
+  
+  drawingCtx = drawingCanvas.getContext('2d');
+  
+  // Set line properties
+  drawingCtx.lineWidth = 2;
+  drawingCtx.lineCap = 'round';
+  drawingCtx.lineJoin = 'round';
+  drawingCtx.strokeStyle = '#ff9fc2';
+  
+  // Drawing functions
+  drawingCanvas.addEventListener('mousedown', startDrawing);
+  drawingCanvas.addEventListener('mousemove', draw);
+  drawingCanvas.addEventListener('mouseup', stopDrawing);
+  drawingCanvas.addEventListener('mouseout', stopDrawing);
+  
+  // Touch events for mobile
+  drawingCanvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent('mousedown', {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    });
+    drawingCanvas.dispatchEvent(mouseEvent);
+  });
+  
+  drawingCanvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent('mousemove', {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    });
+    drawingCanvas.dispatchEvent(mouseEvent);
+  });
+  
+  drawingCanvas.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    const mouseEvent = new MouseEvent('mouseup');
+    drawingCanvas.dispatchEvent(mouseEvent);
+  });
+  
+  // Clear button
+  const clearBtn = qs('#clearDrawing');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function() {
+      drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+    });
+  }
+}
+
+function startDrawing(e) {
+  isDrawing = true;
+  const rect = drawingCanvas.getBoundingClientRect();
+  lastX = e.clientX - rect.left;
+  lastY = e.clientY - rect.top;
+}
+
+function draw(e) {
+  if (!isDrawing) return;
+  const rect = drawingCanvas.getBoundingClientRect();
+  const currentX = e.clientX - rect.left;
+  const currentY = e.clientY - rect.top;
+  
+  drawingCtx.beginPath();
+  drawingCtx.moveTo(lastX, lastY);
+  drawingCtx.lineTo(currentX, currentY);
+  drawingCtx.stroke();
+  
+  lastX = currentX;
+  lastY = currentY;
+}
+
+function stopDrawing() {
+  isDrawing = false;
+}
+
+/* Audio recording */
+function setupAudioRecording() {
+  let stream = null;
+  
+  const startBtn = qs('#startRecording');
+  const stopBtn = qs('#stopRecording');
+  const playBtn = qs('#playRecording');
+  
+  if (!startBtn) return;
+  
+  startBtn.addEventListener('click', async function() {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+      
+      mediaRecorder.addEventListener('dataavailable', event => {
+        audioChunks.push(event.data);
+      });
+      
+      mediaRecorder.addEventListener('stop', () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        currentAudio = audioUrl;
+        qs('#audioPlayback').src = audioUrl;
+        qs('#audioPlayback').style.display = 'block';
+        playBtn.disabled = false;
+      });
+      
+      mediaRecorder.start();
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      playBtn.disabled = true;
+    } catch (err) {
+      console.error('Error accessing microphone:', err);
+      alert('Could not access microphone. Please check your permissions.');
+    }
+  });
+  
+  stopBtn.addEventListener('click', function() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+      stream.getTracks().forEach(track => track.stop());
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      playBtn.disabled = false;
+    }
+  });
+  
+  playBtn.addEventListener('click', function() {
+    if (currentAudio) {
+      qs('#audioPlayback').play();
+    }
+  });
+}
+
+/* Theme switching */
+function setupThemes() {
+  const themeOptions = qsa('.theme-option');
+  themeOptions.forEach(option => {
+    option.addEventListener('click', function() {
+      // Remove selected class from all options
+      themeOptions.forEach(opt => opt.classList.remove('selected'));
+      // Add selected class to clicked option
+      this.classList.add('selected');
+      
+      // Change theme based on data-theme attribute
+      const theme = this.dataset.theme;
+      changeTheme(theme);
+    });
+  });
+}
+
+function changeTheme(theme) {
+  const root = document.documentElement;
+  
+  switch(theme) {
+    case 'blue':
+      root.style.setProperty('--bg', '#f5fbff');
+      root.style.setProperty('--card', '#eaf4ff');
+      root.style.setProperty('--accent', '#b6d7ff');
+      root.style.setProperty('--muted', '#6b8c9b');
+      root.style.setProperty('--ink', '#37484a');
+      root.style.setProperty('--soft', '#d7e6ff');
+      break;
+    case 'purple':
+      root.style.setProperty('--bg', '#fbf7ff');
+      root.style.setProperty('--card', '#f4eaff');
+      root.style.setProperty('--accent', '#d6b6ff');
+      root.style.setProperty('--muted', '#7b6b9b');
+      root.style.setProperty('--ink', '#47374a');
+      root.style.setProperty('--soft', '#e6d7ff');
+      break;
+    case 'green':
+      root.style.setProperty('--bg', '#f7fff7');
+      root.style.setProperty('--card', '#eaffea');
+      root.style.setProperty('--accent', '#b6ffb6');
+      root.style.setProperty('--muted', '#6b9b6b');
+      root.style.setProperty('--ink', '#374a37');
+      root.style.setProperty('--soft', '#d7ffd7');
+      break;
+    default: // pink (default)
+      root.style.setProperty('--bg', '#fff7fb');
+      root.style.setProperty('--card', '#ffeaf4');
+      root.style.setProperty('--accent', '#ffb6d1');
+      root.style.setProperty('--muted', '#9b6b8c');
+      root.style.setProperty('--ink', '#4a3748');
+      root.style.setProperty('--soft', '#ffd7e6');
+  }
+  
+  // Save theme preference
+  state.profile.theme = theme;
+  saveState();
+}
+
+/* Enhanced text formatting with image and font support */
+function setupTextFormatting() {
+  const formatButtons = qsa('[data-format]');
+  formatButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const format = this.dataset.format;
+      document.execCommand(format, false, null);
+      qs('#entryBody').focus();
+      updateWordCountForEntry();
+    });
+  });
+  
+  // Font selector
+  const fontSelector = qs('#fontSelector');
+  fontSelector.addEventListener('change', function() {
+    const fontClass = this.value;
+    if (fontClass) {
+      document.execCommand('formatBlock', false, '<div>');
+      document.execCommand('styleWithCSS', false, true);
+      document.execCommand('fontName', false, 'Arial'); // Reset font first
+      document.execCommand('removeFormat', false, null);
+      
+      const selection = window.getSelection();
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const selectedContent = range.extractContents();
+        const span = document.createElement('span');
+        span.className = fontClass;
+        span.appendChild(selectedContent);
+        range.insertNode(span);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    } else {
+      document.execCommand('removeFormat', false, null);
+    }
+    qs('#entryBody').focus();
+    updateWordCountForEntry();
+  });
+  
+  // Text color picker
+  const colorPicker = qs('#textColorPicker');
+  colorPicker.addEventListener('input', function() {
+    document.execCommand('styleWithCSS', false, true);
+    document.execCommand('foreColor', false, this.value);
+    qs('#entryBody').focus();
+    updateWordCountForEntry();
+  });
+  
+  // Image insertion
+  const insertImageBtn = qs('#insertImageBtn');
+  const imageInput = qs('#imageInput');
+  
+  insertImageBtn.addEventListener('click', function() {
+    imageInput.click();
+  });
+  
+  imageInput.addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        insertImageIntoEditor(event.target.result);
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    }
+    // Reset the input to allow selecting the same file again
+    this.value = '';
+  });
+  
+  // Handle image controls in the editor
+  qs('#entryBody').addEventListener('click', function(e) {
+    // Delete image
+    if (e.target.classList.contains('delete-image')) {
+      e.preventDefault();
+      const imageContainer = e.target.closest('.image-container');
+      if (imageContainer) {
+        imageContainer.remove();
+        updateWordCountForEntry();
+      }
+    }
+  });
+  
+  // Handle image resizing
+  qs('#entryBody').addEventListener('mousedown', function(e) {
+    if (e.target.classList.contains('image-resize-handle')) {
+      e.preventDefault();
+      isResizing = true;
+      currentImage = e.target.parentNode.querySelector('img');
+      startX = e.clientX;
+      startY = e.clientY;
+      startWidth = parseInt(document.defaultView.getComputedStyle(currentImage).width, 10);
+      startHeight = parseInt(document.defaultView.getComputedStyle(currentImage).height, 10);
+      
+      document.addEventListener('mousemove', handleResize);
+      document.addEventListener('mouseup', stopResize);
+    }
+  });
+  
+  function handleResize(e) {
+    if (!isResizing || !currentImage) return;
+    
+    const width = startWidth + (e.clientX - startX);
+    const height = startHeight + (e.clientY - startY);
+    
+    // Set minimum size
+    if (width > 50 && height > 50) {
+      currentImage.style.width = width + 'px';
+      currentImage.style.height = 'auto'; // Maintain aspect ratio
+    }
+  }
+  
+  function stopResize() {
+    isResizing = false;
+    currentImage = null;
+    document.removeEventListener('mousemove', handleResize);
+    document.removeEventListener('mouseup', stopResize);
+  }
+}
+
+/* Insert image into editor with controls */
+function insertImageIntoEditor(src) {
+  const editor = qs('#entryBody');
+  const selection = window.getSelection();
+  const range = selection.getRangeAt(0);
+  
+  // Create image container
+  const container = document.createElement('div');
+  container.className = 'image-container';
+  
+  // Create image
+  const img = document.createElement('img');
+  img.src = src;
+  img.style.maxWidth = '100%';
+  
+  // Create controls
+  const controls = document.createElement('div');
+  controls.className = 'image-controls';
+  
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'tiny-btn delete-image';
+  deleteBtn.innerHTML = '🗑️';
+  deleteBtn.title = 'Delete image';
+  
+  controls.appendChild(deleteBtn);
+  
+  // Create resize handle
+  const resizeHandle = document.createElement('div');
+  resizeHandle.className = 'image-resize-handle';
+  
+  container.appendChild(img);
+  container.appendChild(controls);
+  container.appendChild(resizeHandle);
+  
+  // Insert at cursor position
+  range.insertNode(container);
+  
+  // Focus editor and update word count
+  editor.focus();
+  updateWordCountForEntry();
+}
+
+/* Reminder functions */
+function saveReminder() {
+  const time = qs('#reminderTime').value;
+  if (!time) {
+    alert('Please select a valid time for your reminder.');
+    return;
+  }
+  
+  state.reminder = {
+    enabled: true,
+    time: time
+  };
+  
+  saveState();
+  setupReminder();
+  alert(`Daily reminder set for ${time}! You'll get a notification at this time if you haven't written today.`);
+}
+
+function disableReminder() {
+  state.reminder.enabled = false;
+  saveState();
+  
+  if (reminderInterval) {
+    clearInterval(reminderInterval);
+    reminderInterval = null;
+  }
+  
+  alert('Daily reminder disabled.');
+}
+
+/* EVENTS & wiring */
+function bindEvents(){
+  // Check password on load
+  if (!checkPassword()) {
+    qs('#unlockDiary').addEventListener('click', function() {
+      if (unlockDiary()) {
+        renderAll();
+      }
+    });
+    
+    qs('#passwordInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        if (unlockDiary()) {
+          renderAll();
+        }
+      }
+    });
+  }
+  
+  // open profile / save
+  qs('#openProfile').addEventListener('click', openProfileModal);
+  qs('#openAddEntry').addEventListener('click', ()=>{ editingEntryId = null; openEntry(null, true); populateEntryControls(null, []); });
+  qs('#toggleLock').addEventListener('click', function() {
+    if (state.profile.password) {
+      state.profile.password = null;
+      saveState();
+      alert('Diary unlocked! Password removed.');
+      this.textContent = '🔓';
+    } else {
+      const newPassword = prompt('𝒮𝑒𝓉 𝒶 𝓅𝒶𝓈𝓈𝓌𝑜𝓇𝒹 𝒻𝑜𝓇 𝓎𝑜𝓊𝓇 𝒹𝒾𝒶𝓇𝓎:');
+      if (newPassword) {
+        state.profile.password = newPassword;
+        saveState();
+        alert('Password set! Your diary is now locked.');
+        this.textContent = '🔒';
+      }
+    }
+  });
+
+  qs('#saveProfileBtn').addEventListener('click', ()=>{
+    const name = qs('#profileNameInput').value.trim();
+    const bio = qs('#profileBioInput').value.trim();
+    const color = qs('#profileColorInput').value.trim();
+    const password = qs('#diaryPassword').value.trim();
+    state.profile.name = name || 'Dear Diary';
+    state.profile.bio = bio || '';
+    state.profile.color = color || 'pastel';
+    if (password) {
+      state.profile.password = password;
+      qs('#toggleLock').textContent = '🔒';
+    }
+    saveState();
+    closeModal('#profileModal');
+  });
+
+  // profile picture upload
+  qs('#profilePicInput').addEventListener('change', async (ev)=>{
+    const file = ev.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      state.profile.pfp = reader.result;
+      saveState();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // folder manager
+  qs('#openFolderManager').addEventListener('click', openFolderManager);
+  qs('#createFolderBtn').addEventListener('click', ()=>{
+    const v = qs('#newFolderName').value.trim();
+    if(v) { addFolder(v); qs('#newFolderName').value = ''; }
+  });
+  qs('#addFolderBtn').addEventListener('click', ()=> {
+    const name = prompt('New folder name');
+    if(name && name.trim()) addFolder(name.trim());
+  });
+
+  // tag manager
+  qs('#openTagManager').addEventListener('click', openTagManager);
+  qs('#createTagBtn').addEventListener('click', ()=>{
+    const v = qs('#newTagName').value.trim();
+    if(v) { addTag(v); qs('#newTagName').value = ''; }
+  });
+  qs('#addTagBtn').addEventListener('click', ()=> {
+    const name = prompt('New tag name (no #)');
+    if(name && name.trim()) addTag(name.trim());
+  });
+
+  // entry modal save
+  qs('#saveEntryBtn').addEventListener('click', saveEntryFromModal);
+  
+  // Mood selection
+  qsa('.mood-option').forEach(option => {
+    option.addEventListener('click', function() {
+      qsa('.mood-option').forEach(opt => opt.classList.remove('selected'));
+      this.classList.add('selected');
+    });
+  });
+  
+  // Weather selection
+  qsa('.weather-option').forEach(option => {
+    option.addEventListener('click', function() {
+      qsa('.weather-option').forEach(opt => opt.classList.remove('selected'));
+      this.classList.add('selected');
+    });
+  });
+  
+  // Word count for entry body
+  qs('#entryBody').addEventListener('input', updateWordCountForEntry);
+  
+  // Close modal buttons
+  qsa('[data-close]').forEach(btn=> btn.addEventListener('click', (e)=>{
+    const modal = e.target.closest('.modal'); if(modal) closeModal('#' + modal.id);
+  }));
+  qsa('.modal-close').forEach(b=> b.addEventListener('click', (e)=>{
+    const modal = e.target.closest('.modal'); if(modal) closeModal('#' + modal.id);
+  }));
+
+  // Click outside modal to close
+  qsa('.modal').forEach(m=>{
+    m.addEventListener('click', (e)=> {
+      if(e.target === m) closeModal('#' + m.id);
+    });
+  });
+
+  // search / sort
+  qs('#searchInput').addEventListener('input', renderEntries);
+  qs('#sortSelect').addEventListener('change', renderEntries);
+  qs('#clearSearch').addEventListener('click', function() {
+    qs('#searchInput').value = '';
+    renderEntries();
+  });
+
+  // clear all
+  qs('#clearAll').addEventListener('click', ()=>{
+    if(confirm('Clear all diary data from this browser? This cannot be undone.')) {
+      localStorage.removeItem(STORAGE_KEY);
+      state = { 
+        profile: { name:'Dear Diary', bio:'A tiny space for little thoughts.', color:'pastel', pfp:null, password: null }, 
+        folders:[], 
+        tags:[], 
+        entries:[],
+        streak: { count: 0, lastEntryDate: null },
+        reminder: { enabled: false, time: "20:00" }
+      };
+      saveState();
+    }
+  });
+  
+  // export data
+  qs('#exportBtn').addEventListener('click', exportData);
+  
+  // import data
+  const importInput = document.createElement('input');
+  importInput.type = 'file';
+  importInput.accept = '.json';
+  importInput.style.display = 'none';
+  document.body.appendChild(importInput);
+  
+  importInput.addEventListener('change', function() {
+    if (this.files.length > 0) {
+      importData(this.files[0]);
+    }
+  });
+  
+  // Add import button next to export
+  const importBtn = el('button', { 
+    className: 'btn ghost', 
+    innerText: 'Import',
+    id: 'importBtn'
+  });
+  importBtn.addEventListener('click', function() {
+    importInput.click();
+  });
+  qs('#exportBtn').insertAdjacentElement('afterend', importBtn);
+  
+  // Reminder buttons
+  qs('#saveReminderBtn').addEventListener('click', saveReminder);
+  qs('#disableReminderBtn').addEventListener('click', disableReminder);
+  
+  // Close reminder notification
+  qs('#closeReminder').addEventListener('click', function() {
+    qs('#reminderNotification').classList.remove('show');
+  });
+  
+  // Setup drawing and audio
+  setupDrawing();
+  setupAudioRecording();
+  setupThemes();
+  setupTextFormatting();
+}
+
+/* INIT */
+function renderAll(){
+  renderProfile(); 
+  renderFolders(); 
+  renderTags(); 
+  renderEntries(); 
+  updateWordCount();
+  updateStreakDisplay();
+  
+  // Update lock button state
+  if (state.profile.password) {
+    qs('#toggleLock').textContent = '🔒';
+  } else {
+    qs('#toggleLock').textContent = '🔓';
+  }
+  
+  // Apply saved theme
+  if (state.profile.theme) {
+    const themeOption = qs(`.theme-option[data-theme="${state.profile.theme}"]`);
+    if (themeOption) {
+      qsa('.theme-option').forEach(opt => opt.classList.remove('selected'));
+      themeOption.classList.add('selected');
+      changeTheme(state.profile.theme);
+    }
+  }
+  
+  // Setup reminder if enabled
+  if (state.reminder.enabled) {
+    setupReminder();
+  }
+}
+
+function init(){
+  loadState();
+  bindEvents();
+  renderAll();
+  
+  // Add cute greeting based on time of day
+  const hour = new Date().getHours();
+  let greeting = "Hello, beautiful!";
+  if (hour < 12) greeting = "Good morning, sunshine!";
+  else if (hour < 18) greeting = "Good afternoon, darling!";
+  else greeting = "Good evening, sweetheart!";
+  
+  // Show greeting if no entries
+  if (state.entries.length === 0) {
+    setTimeout(() => {
+      alert(`🌸 ${greeting} Ready to write your first entry? 🌸`);
+    }, 1000);
+  }
+}
+init();
+
+</script>
+</body>
+</html>
