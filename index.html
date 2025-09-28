@@ -394,7 +394,16 @@
     background: white;
     font-size: 0.85rem;
   }
-  
+
+  .font-size-selector {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 182, 193, 0.35);
+  background: white;
+  font-size: 0.85rem;
+  margin-right: 4px;
+}
+	
   .color-picker {
     width: 30px;
     height: 30px;
@@ -738,11 +747,11 @@
         <button class="tiny-btn" data-format="bold" title="Bold">B</button>
         <button class="tiny-btn" data-format="italic" title="Italic">I</button>
         <button class="tiny-btn" data-format="underline" title="Underline">U</button>
-	<select class="font-size-selector" id="fontSizeSelector">
-	<option value="12px">Small</option>
-	<option value="16px" selected>Medium</option>
-	<option value="20px">Large</option>
-	<option value="24px">X-Large</option>
+		<select class="font-size-selector" id="fontSizeSelector">
+		    <option value="12px">Small</option>
+		    <option value="16px" selected>Medium</option>
+		    <option value="20px">Large</option>
+		    <option value="24px">X-Large</option>
 	  </select>
         <select class="font-selector" id="fontSelector">
           <option value="">Default Font</option>
@@ -1840,7 +1849,45 @@ function setupTextFormatting() {
       updateWordCountForEntry();
     });
   });
-  
+    // Font size selector - flexible version
+  const fontSizeSelector = qs('#fontSizeSelector');
+  fontSizeSelector.addEventListener('change', function() {
+    const size = this.value;
+    
+    // Save the current selection
+    const selection = window.getSelection();
+    if (selection.rangeCount === 0) return;
+    
+    const range = selection.getRangeAt(0);
+    
+    // Apply font size to the current selection or at cursor position
+    document.execCommand('styleWithCSS', false, true);
+    
+    // Create a span with the desired font size
+    const span = document.createElement('span');
+    span.style.fontSize = size;
+    
+    // If there's selected text, wrap it in the span
+    if (!range.collapsed) {
+      const content = range.extractContents();
+      span.appendChild(content);
+      range.insertNode(span);
+    } else {
+      // If no text selected, insert the span for future typing
+      range.insertNode(span);
+      
+      // Move cursor inside the span
+      const newRange = document.createRange();
+      newRange.setStart(span, 0);
+      newRange.setEnd(span, 0);
+      selection.removeAllRanges();
+      selection.addRange(newRange);
+    }
+    
+    qs('#entryBody').focus();
+    updateWordCountForEntry();
+  });
+	
   // Font selector
   const fontSelector = qs('#fontSelector');
   fontSelector.addEventListener('change', function() {
@@ -2260,7 +2307,7 @@ function init(){
   // Show greeting if no entries
   if (state.entries.length === 0) {
     setTimeout(() => {
-      alert(`🌸 ${greeting} Ready to write your first entry? 🌸`);
+      alert(`🌸 ${greeting} Ready to write? 🌸`);
     }, 1000);
   }
 }
@@ -2269,3 +2316,4 @@ init();
 </script>
 </body>
 </html>
+
