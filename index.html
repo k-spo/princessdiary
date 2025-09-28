@@ -375,6 +375,130 @@
     color: var(--muted);
   }
 
+/* Calendar button and modal */
+.calendar-btn {
+  background: linear-gradient(90deg, #ffb6d1, #ffc0d6);
+  border: none;
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calendar-btn:hover {
+  box-shadow: 0 4px 12px rgba(255,182,193,0.4);
+  transform: translateY(-2px);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255,182,193,0.3);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 1rem;
+}
+
+.calendar-day-header {
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--muted);
+  padding: 0.5rem 0;
+}
+
+.calendar-day {
+  text-align: center;
+  padding: 0.6rem 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendar-day:hover {
+  background: rgba(255,182,193,0.2);
+}
+
+.calendar-day.other-month {
+  color: #ccc;
+}
+
+.calendar-day.today {
+  background: rgba(255,182,193,0.3);
+  font-weight: bold;
+}
+
+.calendar-day.has-entry::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  width: 4px;
+  height: 4px;
+  background: #ff6b93;
+  border-radius: 50%;
+}
+
+.calendar-day.selected {
+  background: #ffb6d1;
+  color: white;
+}
+
+.calendar-nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.calendar-nav-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+.calendar-nav-btn:hover {
+  background: rgba(255,182,193,0.1);
+}
+
+.calendar-entries {
+  margin-top: 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.calendar-entry-item {
+  padding: 0.5rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  background: rgba(255,255,255,0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.calendar-entry-item:hover {
+  background: rgba(255,182,193,0.1);
+  transform: translateX(4px);
+}
   /* New styles for enhanced editor */
   .editor-toolbar {
     display: flex;
@@ -496,6 +620,11 @@
   </div>
   <div class="controls">
     <button class="add-btn" id="openAddEntry">+ New Entry</button>
+  <!-- ADD CALENDAR BUTTON HERE -->
+  <button class="calendar-btn" id="openCalendar">
+    <span>📅</span>
+    <span>Calendar</span>
+  </button>
     <button class="add-btn" id="openProfile" style="width:120px;background:transparent;border:1px solid rgba(255,182,193,0.35);color:var(--muted);">Profile</button>
     <button class="add-btn" id="toggleLock" style="width:60px;background:transparent;border:1px solid rgba(255,182,193,0.35);color:var(--muted);">🔒</button>
   </div>
@@ -507,9 +636,9 @@
     <div class="profile">
       <div class="pfp" id="pfpPreview">🌸</div>
       <div class="meta">
-        <h3 id="profileName">Dear Diary</h3>
-        <p id="profileBio">A tiny space for little thoughts.</p>
-        <div style="margin-top:.4rem"><small id="profileColor">𝘍𝘢𝘷𝘰𝘳𝘪𝘵𝘦 𝘤𝘰𝘭𝘰𝘳: pastel pink</small></div>
+        <h3 id="profileName">Set up your profile</h3>
+        <p id="profileBio">Press "Profile" (top right corner).</p>
+        <div style="margin-top:.4rem"><small id="profileColor">𝘍𝘢𝘷𝘰𝘳𝘪𝘵𝘦 𝘤𝘰𝘭𝘰𝘳:</small></div>
       </div>
     </div>
 
@@ -825,6 +954,38 @@
   </div>
 </div>
 
+<!-- CALENDAR MODAL -->
+<div class="modal" id="calendarModal" aria-hidden="true">
+  <div class="modal-card" style="max-width: 600px;">
+    <button class="modal-close" data-close>&times;</button>
+    
+    <div class="calendar-header">
+      <div class="calendar-nav">
+        <button class="calendar-nav-btn" id="prevMonth">◀</button>
+        <h3 id="calendarMonthYear">Month Year</h3>
+        <button class="calendar-nav-btn" id="nextMonth">▶</button>
+      </div>
+    </div>
+
+    <div class="calendar-grid">
+      <div class="calendar-day-header">Sun</div>
+      <div class="calendar-day-header">Mon</div>
+      <div class="calendar-day-header">Tue</div>
+      <div class="calendar-day-header">Wed</div>
+      <div class="calendar-day-header">Thu</div>
+      <div class="calendar-day-header">Fri</div>
+      <div class="calendar-day-header">Sat</div>
+      <!-- Calendar days will be populated by JavaScript -->
+    </div>
+
+    <div class="calendar-entries" id="calendarEntries">
+      <div style="text-align: center; color: var(--muted); padding: 1rem;">
+        Select a date to view entries
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Confirm delete modal -->
 <div class="modal" id="confirmModal">
   <div class="modal-card">
@@ -894,6 +1055,9 @@ let reminderInterval = null;
 let isResizing = false;
 let currentImage = null;
 let startX, startY, startWidth, startHeight;
+
+// Calendar variables
+let currentCalendarDate = new Date();
 
 function loadState(){
   try {
@@ -1450,7 +1614,8 @@ function getMoodEmoji(mood) {
     'love': '😍',
     'angry': '😠',
     'sick': '🤒',
-    'neutral': '😐'
+    'neutral': '😐',
+    'mask': '🎭'
   };
   return moodMap[mood] || '';
 }
@@ -1541,7 +1706,7 @@ function saveEntryFromModal(){
     saveState();
     createConfetti();
     
-    // Show heart animation for streak
+    // Show heart animation for streak encouragement
     showHeartAnimation();
   }
   editingEntryId = null;
@@ -2067,8 +2232,158 @@ function disableReminder() {
   alert('Daily reminder disabled.');
 }
 
+/* Calendar functionality */
+function renderCalendar() {
+  const calendarGrid = qs('.calendar-grid');
+  const monthYearDisplay = qs('#calendarMonthYear');
+  
+  // Clear existing days (keep headers)
+  while (calendarGrid.children.length > 7) {
+    calendarGrid.removeChild(calendarGrid.lastChild);
+  }
+  
+  // Set month/year display
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                 'July', 'August', 'September', 'October', 'November', 'December'];
+  monthYearDisplay.textContent = `${months[currentCalendarDate.getMonth()]} ${currentCalendarDate.getFullYear()}`;
+  
+  // Get first day of month and number of days
+  const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
+  const lastDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0);
+  const daysInMonth = lastDay.getDate();
+  const startingDay = firstDay.getDay();
+  
+  // Add empty cells for days before the first day of month
+  for (let i = 0; i < startingDay; i++) {
+    const emptyDay = document.createElement('div');
+    emptyDay.className = 'calendar-day other-month';
+    const prevMonthLastDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 0).getDate();
+    emptyDay.textContent = prevMonthLastDay - startingDay + i + 1;
+    calendarGrid.appendChild(emptyDay);
+  }
+  
+  // Add days of current month
+  const today = new Date();
+  for (let i = 1; i <= daysInMonth; i++) {
+    const day = document.createElement('div');
+    day.className = 'calendar-day';
+    day.textContent = i;
+    day.dataset.date = `${currentCalendarDate.getFullYear()}-${(currentCalendarDate.getMonth() + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
+    
+    // Check if this day has entries
+    const hasEntries = state.entries.some(entry => {
+      const entryDate = new Date(entry.created).toISOString().split('T')[0];
+      return entryDate === day.dataset.date;
+    });
+    
+    if (hasEntries) {
+      day.classList.add('has-entry');
+    }
+    
+    // Check if it's today
+    if (i === today.getDate() && 
+        currentCalendarDate.getMonth() === today.getMonth() && 
+        currentCalendarDate.getFullYear() === today.getFullYear()) {
+      day.classList.add('today');
+    }
+    
+    // Add click event
+    day.addEventListener('click', () => selectCalendarDate(day.dataset.date));
+    
+    calendarGrid.appendChild(day);
+  }
+  
+  // Add empty cells for days after the last day of month
+  const totalCells = 42; // 6 weeks
+  const remainingCells = totalCells - (startingDay + daysInMonth);
+  for (let i = 1; i <= remainingCells; i++) {
+    const emptyDay = document.createElement('div');
+    emptyDay.className = 'calendar-day other-month';
+    emptyDay.textContent = i;
+    calendarGrid.appendChild(emptyDay);
+  }
+}
+
+function selectCalendarDate(dateString) {
+  // Remove selected class from all days
+  qsa('.calendar-day').forEach(day => day.classList.remove('selected'));
+  
+  // Add selected class to clicked day
+  const selectedDay = qs(`[data-date="${dateString}"]`);
+  if (selectedDay) {
+    selectedDay.classList.add('selected');
+  }
+  
+  // Show entries for this date
+  showCalendarEntries(dateString);
+}
+
+function showCalendarEntries(dateString) {
+  const entriesContainer = qs('#calendarEntries');
+  const selectedDate = new Date(dateString);
+  const formattedDate = selectedDate.toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+  
+  // Filter entries for this date
+  const dayEntries = state.entries.filter(entry => {
+    const entryDate = new Date(entry.created).toISOString().split('T')[0];
+    return entryDate === dateString;
+  });
+  
+  if (dayEntries.length === 0) {
+    entriesContainer.innerHTML = `
+      <div style="text-align: center; color: var(--muted); padding: 1rem;">
+        No entries for ${formattedDate}
+      </div>
+    `;
+  } else {
+    entriesContainer.innerHTML = `
+      <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--ink);">
+        Entries for ${formattedDate} (${dayEntries.length})
+      </div>
+    `;
+    
+    dayEntries.forEach(entry => {
+      const entryItem = document.createElement('div');
+      entryItem.className = 'calendar-entry-item';
+      entryItem.innerHTML = `
+        <div style="font-weight: 600; color: #5a2e47;">${entry.title || '(untitled)'}</div>
+        <div style="font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem;">
+          ${new Date(entry.created).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+        </div>
+      `;
+      entryItem.addEventListener('click', () => {
+        closeModal('#calendarModal');
+        viewEntry(entry.id);
+      });
+      entriesContainer.appendChild(entryItem);
+    });
+  }
+}
+
+function openCalendar() {
+  renderCalendar();
+  openModal('#calendarModal');
+}
+
+function setupCalendar() {
+  qs('#openCalendar').addEventListener('click', openCalendar);
+  qs('#prevMonth').addEventListener('click', () => {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+    renderCalendar();
+  });
+  qs('#nextMonth').addEventListener('click', () => {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+    renderCalendar();
+  });
+}
+
 /* EVENTS & wiring */
-function bindEvents(){
+function bindEvents() {
   // Check password on load
   if (!checkPassword()) {
     qs('#unlockDiary').addEventListener('click', function() {
@@ -2076,7 +2391,7 @@ function bindEvents(){
         renderAll();
       }
     });
-    
+
     qs('#passwordInput').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         if (unlockDiary()) {
@@ -2085,6 +2400,7 @@ function bindEvents(){
       }
     });
   }
+
   
   // open profile / save
   qs('#openProfile').addEventListener('click', openProfileModal);
@@ -2258,6 +2574,9 @@ function bindEvents(){
   setupAudioRecording();
   setupThemes();
   setupTextFormatting();
+  
+  // Setup calendar
+  setupCalendar();
 }
 
 /* INIT */
@@ -2316,4 +2635,3 @@ init();
 </script>
 </body>
 </html>
-
